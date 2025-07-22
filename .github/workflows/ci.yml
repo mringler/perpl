@@ -14,7 +14,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                php-version: [ '7.4', '8.2' ]
+                php-version: [ '7.4', '8.0', '8.1', '8.2', '8.3', '8.4' ]
                 db-type: [ sqlite, mysql, pgsql, agnostic ]
                 symfony-version: [ '5-min', '5-max', '6-min', '6-max', '7-min', '7-max']
                 exclude:
@@ -22,10 +22,22 @@ jobs:
                     php-version: '7.4'
                   - symfony-version: '6-max'
                     php-version: '7.4'
+                  - symfony-version: '6-min'
+                    php-version: '8.0'
+                  - symfony-version: '6-max'
+                    php-version: '8.0'
                   - symfony-version: '7-min'
                     php-version: '7.4'
                   - symfony-version: '7-max'
                     php-version: '7.4'
+                  - symfony-version: '7-min'
+                    php-version: '8.0'
+                  - symfony-version: '7-max'
+                    php-version: '8.0'
+                  - symfony-version: '7-min'
+                    php-version: '8.1'
+                  - symfony-version: '7-max'
+                    php-version: '8.1'
         env:
             DB_NAME: 'propel_tests'
             DB_USER: 'propel'
@@ -39,8 +51,17 @@ jobs:
                   postgresql user: $DB_USER
                   postgresql password: $DB_PW
 
+            - name: Install PostgreSQL 16
+              if: matrix.db-type == 'pgsql' && matrix.php-version == '7.4' && matrix.symfony-version == '5-max'
+              uses: CasperWA/postgresql-action@v1.2
+              with:
+                  postgresql version: 16
+                  postgresql db: $DB_NAME
+                  postgresql user: $DB_USER
+                  postgresql password: $DB_PW
+
             - name: Install PostgreSQL min
-              if: matrix.db-type == 'pgsql' && matrix.php-version == '7.4'
+              if: matrix.db-type == 'pgsql' && matrix.php-version == '7.4' && matrix.symfony-version == '5-min'
               uses: CasperWA/postgresql-action@v1.2
               with:
                   postgresql version: 9
