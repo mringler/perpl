@@ -839,7 +839,7 @@ class Criteria
      */
     public function setUpdateValue($columnIdentifierOrMap, $value, $pdoType = null)
     {
-// NOTE: $pdoType is not typed as `?int` due to fallback.
+        // NOTE: $pdoType is not typed as `?int` due to fallback.
 
         if (is_array($value) && isset($value['raw'])) {
             trigger_error('Use Criteria::setUpdateExpression() instead of deprecated column value ' . print_r($value, true), E_USER_WARNING);
@@ -1745,7 +1745,11 @@ class Criteria
 
         // merge join
         foreach ($criteria->getJoins() as $key => $join) {
-            if ($join->getLeftTableName() !== $this->getPrimaryTableName() && $join->getRightTableName() === $this->getPrimaryTableName()) {
+            if (
+                $join->getLeftTableName() !== $this->getPrimaryTableName()
+                && $join->getRightTableName() === $this->getPrimaryTableName()
+                && (!$this instanceof BaseModelCriteria || $join->getRightTableAlias() === $this->getModelAlias())
+            ) {
                 $join->invert();
             }
         }

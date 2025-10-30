@@ -2674,6 +2674,24 @@ class ModelCriteriaTest extends BookstoreTestBase
     /**
      * @return void
      */
+    public function testMergeWithSecondTableInstance()
+    {
+        $params = [];
+        $actualSql = BookQuery::create()
+        ->useAuthorQuery()
+            ->joinBook('lastBook')
+            ->addDescendingOrderByColumn('lastBookId')
+            ->addAsColumn('lastBookId', 'lastBook.id')
+        ->endUse()
+        ->filterById(1)
+        ->createSelectSql($params);
+        $expectedSql = $this->getSql('SELECT lastBook.id AS lastBookId FROM book LEFT JOIN author ON (book.author_id=author.id) LEFT JOIN book lastBook ON (author.id=lastBook.author_id) WHERE book.id=:p1 ORDER BY lastBookId DESC');
+        $this->assertSame($expectedSql, $actualSql);
+    }
+
+    /**
+     * @return void
+     */
     public function testMergeWithWiths()
     {
         $c1 = new ModelCriteria('bookstore', 'Propel\Tests\Bookstore\Book', 'b');
