@@ -1136,7 +1136,7 @@ abstract class {$this->getUnqualifiedClassName()}$parentClass implements ActiveR
 
         $script .= "
         \$tableMap = {$this->getTableMapClass()}::getTableMap();
-        \$criteria = " . $this->getQueryClassName() . '::create();';
+        \$query = " . $this->getQueryClassName() . '::create();';
         foreach ($this->getTable()->getPrimaryKey() as $column) {
             $dataAccessExpression = '$this->' . $column->getLowercasedName();
             if ($column->getType() === PropelTypes::UUID_BINARY) {
@@ -1145,8 +1145,8 @@ abstract class {$this->getUnqualifiedClassName()}$parentClass implements ActiveR
             }
             $columnName = $column->getName();
             $script .= "
-        \${$columnName}Column = new LocalColumnExpression(\$criteria, \$tableMap->getName(), \$tableMap->getColumn('$columnName'));
-        \$criteria->addFilter(\${$columnName}Column, $dataAccessExpression);";
+        \${$columnName}Column = new LocalColumnExpression(\$query, \$tableMap->getName(), \$tableMap->getColumn('$columnName'));
+        \$query->addAnd(\${$columnName}Column, $dataAccessExpression);";
         }
     }
 
@@ -1163,7 +1163,7 @@ abstract class {$this->getUnqualifiedClassName()}$parentClass implements ActiveR
     {
         $script .= "
 
-        return \$criteria;
+        return \$query;
     }
 ";
     }

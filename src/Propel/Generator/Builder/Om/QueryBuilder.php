@@ -1131,7 +1131,7 @@ class QueryBuilder extends AbstractOMBuilder
         } elseif (\$comparison == Criteria::CONTAINS_NONE) {
             \$resolvedColumn = \$this->resolveLocalColumnByName('$colName');
             if (\${$variableName} !== 0) {
-                \$this->addFilter(\$resolvedColumn, \${$variableName}, Criteria::BINARY_NONE);
+                \$this->addAnd(\$resolvedColumn, \${$variableName}, Criteria::BINARY_NONE);
             }
             \$this->addOr(\$resolvedColumn, null, Criteria::ISNULL);
 

@@ -1552,7 +1552,7 @@ class " . $this->getUnqualifiedClassName() . " extends TableMap
                 $pkey = $table->getPrimaryKey();
                 $col = array_shift($pkey);
                 $script .= "
-            \$criteria->addFilter(" . $this->getColumnConstant($col) . ', (array)$values, Criteria::IN);';
+            \$criteria->addAnd(" . $this->getColumnConstant($col) . ', (array)$values, Criteria::IN);';
             } else {
                 $script .= "
             // primary key is composite; we therefore, expect
