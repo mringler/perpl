@@ -51,22 +51,34 @@ class ColumnCodeProducer extends ObjectCodeProducer
 
     /**
      * @param string $script
-     * @param string|null $columnType
+     * @param string|null $columnDocType
      *
      * @return void
      */
-    public function addDefaultColumnAttribute(string &$script, ?string $columnType = null): void
+    public function addDefaultColumnAttribute(string &$script, ?string $columnDocType = null): void
     {
-        $columnType ??= $this->getQualifiedTypeString();
-        $clo = $this->column->getLowercasedName();
+        $columnName = $this->column->getLowercasedName();
+        $rawType = $columnDocType ?? $this->getQualifiedTypeString();
+        $omitTypeHint = !(bool)$this->getBuildProperty('generator.objectModel.typeColumnDataFields')
+            || $this->column->isTemporalType() // should be DateTimeInterface, but requires adjustment in methods
+            || $this->column->isPhpObjectType() // requires fix
+            || array_intersect(explode('|', $rawType), ['resource', 'mixed']);
+
+        if ($omitTypeHint) {
+            $docType = "$rawType|null";
+            $columnDeclaration = "\${$columnName}";
+        } else {
+            $docType = $this->referencedClasses->resolveTypeHintFromDocType($rawType) . '|null';
+            $columnDeclaration = "$docType \${$columnName} = null";
+        }
 
         $script .= "
     /**
-     * The value for the $clo field.{$this->getColumnDescriptionDoc()}{$this->getDefaultValueDescription()}
+     * The value for the $columnName field.{$this->getColumnDescriptionDoc()}{$this->getDefaultValueDescription()}
      *
-     * @var $columnType|null
+     * @var $docType
      */
-    protected \${$clo };\n";
+    protected $columnDeclaration;\n";
     }
 
     /**
@@ -328,7 +340,7 @@ class ColumnCodeProducer extends ObjectCodeProducer
      */
     protected function addMutatorBody(string &$script): void
     {
-         $clo = $this->column->getLowercasedName();
+        $clo = $this->column->getLowercasedName();
 
         if ($this->column->isPhpPrimitiveType()) {
             $type = $this->column->getPhpType();
