@@ -69,7 +69,6 @@ class ColumnCodeProducer extends ObjectCodeProducer
         $rawType = $columnDocType ?? $this->getQualifiedTypeString();
         $omitTypeHint = !(bool)$this->getBuildProperty('generator.objectModel.typeColumnDataFields')
             || $this->column->isTemporalType() // should be DateTimeInterface, but requires adjustment in methods
-            || $this->column->isPhpObjectType() // requires fix
             || array_intersect(explode('|', $rawType), ['resource', 'mixed']);
 
         if ($omitTypeHint) {
